@@ -77,7 +77,7 @@ public:
 			textureSprite.setTextureRect({ { 19 * 64, 10 * 64 }, { 64, 64 } });
 			break;
 		case type::rocket:
-			cooldownTime = 3.0f;
+			cooldownTime = 4.0f;
 			range = 200;
 			textureSprite.setSize({ 55, 55 });
 			textureSprite.setTextureRect({ { 22 * 64, 8 * 64 }, { 64, 64 } });
@@ -94,7 +94,7 @@ public:
 				if (currency < 3) return false;
 				break;
 			case type::rocket:
-				if (currency < 8) return false;
+				if (currency < 10) return false;
 				break;
 			}
 			sf::Vector2i mapPosition = { static_cast<int>(position.x) / 64, static_cast<int>(position.y) / 64 };
@@ -193,7 +193,7 @@ public:
 				cooldownTime = 1.95f; // Reset cooldown time for the next shot
 				break;
 			case type::rocket:
-				cooldownTime = 3.0f; // Reset cooldown time for the next shot
+				cooldownTime = 4.0f; // Reset cooldown time for the next shot
 				break;
 			}
 			for (Projectile& projectile : projectiles) {

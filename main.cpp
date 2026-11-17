@@ -222,7 +222,7 @@ int main() {
 									currency -= 5;
 									break;
 								case type::rocket:
-									currency -= 8;
+									currency -= 10;
 									break;
 								}
 							}
