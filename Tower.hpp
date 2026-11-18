@@ -54,7 +54,7 @@ public:
 			textureSprite.setTextureRect({ { 19 * 64, 10 * 64 }, { 64, 64 } }); 
 			break;
 		case type::rocket:
-			cooldownTime = 3.0f;
+			cooldownTime = 4.0f;
 			range = 200;
 			textureSprite.setSize({ 55, 55 });
 			textureSprite.setTexture(&texture);
