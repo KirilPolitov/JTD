@@ -291,7 +291,8 @@ int main() {
 					enemy.update(deltaTime, tiles.data(), 16, 16, lives);
 				}
 				for (Tower& towerI : towers) {
-					towerI.updateCooldown(deltaTime);
+					if (waveIsActive)
+						towerI.updateCooldown(deltaTime);
 					//if (towerI.getType() == type::turret) {
 						for (const Enemy& enemy : enemies) {
 							if (enemy.getIsDead()) continue; // Skip dead enemies
