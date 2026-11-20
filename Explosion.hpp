@@ -8,15 +8,15 @@ class Explosion : public sf::Drawable, public sf::Transformable {
 	float frameTime = 0.2f; // Time per frame in seconds
 	bool active = true;
 public:
-	Explosion(sf::Texture& texture) :
-		textureSprite({90, 90}), active(true) {
+	Explosion(sf::Texture& texture, sf::Vector2f size = {90, 90}, float duration = 0.2f) :
+		textureSprite(size), active(true), frameTime(duration) {
 		textureSprite.setTexture(&texture);
 		textureSprite.setOrigin(textureSprite.getLocalBounds().size / 2.0f);
 	}
-	void callExplosion(sf::Vector2f position) {
+	void callExplosion(sf::Vector2f position, float duration = 0.2f) {
 		textureSprite.setPosition(position);
 		active = true;
-		frameTime = 0.2f; // Reset frame time for the explosion
+		frameTime = duration; // Reset frame time for the explosion
 	}
 	const bool isActive() const {
 		return active;

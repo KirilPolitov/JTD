@@ -69,7 +69,7 @@ public:
 	const bool isActive() const {
 		return active;
 	}
-	CollisionResult update(float deltaTime, std::vector<Enemy>& enemies, int& currency, std::vector<Explosion>& explosions, sf::Texture& explosionTexture, bool noMove = false) {
+	CollisionResult update(float deltaTime, std::vector<Enemy>& enemies, int& currency, std::vector<Explosion>& explosions, std::vector<Explosion>& deathExplosions, sf::Texture& explosionTexture, bool noMove = false) {
 		if (!active) return CollisionResult::Miss;
 		if (!noMove) {
 			textureSprite.move(m_direction.normalized() * m_speed * deltaTime);
@@ -123,6 +123,21 @@ public:
 					case EnemyType::tank:
 						currency += 3;
 						break;
+					}
+					bool explosionTriggered = false;
+					for (Explosion& explosion : deathExplosions) {
+						if (!explosion.isActive()) {
+							explosion.callExplosion(enemy.getPosition(), 0.1f);
+							explosion.randomizeRotation();
+							explosionTriggered = true;
+							break;
+						}
+					}
+					if (!explosionTriggered) {
+						Explosion newExplosion(explosionTexture, {40, 40}, 0.1f);
+						newExplosion.callExplosion(enemy.getPosition(), 0.1f);
+						newExplosion.randomizeRotation();
+						deathExplosions.push_back(newExplosion);
 					}
 				}
 				return CollisionResult::Hit;

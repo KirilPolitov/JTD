@@ -80,10 +80,13 @@ int main() {
 	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::tank, 8, 1.f }}, { 0, 2 }, tileSet));
 	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::tank, 15, 0.5f }}, { 0, 2 }, tileSet));
 	std::vector<Explosion> explosions;
+	explosions.reserve(8);
 	sf::Texture explosionTexture;
 	if (!explosionTexture.loadFromFile(exePath / "textures" / "Explosion.png")) {
 		return -1;
 	}
+	std::vector<Explosion> deathExplosions;
+	deathExplosions.reserve(8);
 	/*
 	std::vector<sf::Sprite> explosionSprites;
 	explosionSprites.reserve(8);*/
@@ -322,9 +325,21 @@ int main() {
 				for (int i = 0; i < towers.size(); i++) {
 					window.draw(towers[i]);
 				}
+				for (Explosion& explosion : deathExplosions) {
+					if (explosion.isActive()) {
+						explosion.updateCooldown(deltaTime);
+						window.draw(explosion);
+					}
+				}
+				for (Explosion& explosion : explosions) {
+					if (explosion.isActive()) {
+						explosion.updateCooldown(deltaTime);
+						window.draw(explosion);
+					}
+				}
 				for (Projectile& projectile : turretProjectiles) {
 					if (projectile.isActive()) {
-						CollisionResult result = projectile.update(deltaTime, enemies, currency, explosions, explosionTexture);
+						CollisionResult result = projectile.update(deltaTime, enemies, currency, explosions, deathExplosions, explosionTexture);
 
 						if (result == CollisionResult::Hit) {
 							// Hit logic handled inside update, nothing extra needed here
@@ -338,7 +353,7 @@ int main() {
 				}
 				for (Projectile& projectile : rocketProjectiles) {
 					if (projectile.isActive()) {
-						CollisionResult result = projectile.update(deltaTime, enemies, currency, explosions, explosionTexture);
+						CollisionResult result = projectile.update(deltaTime, enemies, currency, explosions, deathExplosions, explosionTexture);
 						if (result == CollisionResult::Hit) {
 							// Hit logic handled inside update, nothing extra needed here
 						}
@@ -365,10 +380,6 @@ int main() {
 				livesText.setString("Lives: " + std::to_string(lives));
 				livesText.setOrigin({ livesText.getLocalBounds().size.x, 0 });
 				window.draw(livesText);
-				for (Explosion& explosion : explosions) {
-					explosion.updateCooldown(deltaTime);
-					window.draw(explosion);
-				}
 		}
 		window.display();
 	}
