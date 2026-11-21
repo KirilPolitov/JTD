@@ -1,10 +1,12 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "TileMap.hpp"
 #include "Enemy.hpp"
 #include "MapDisplay.hpp"
 #include "Tower.hpp"
 #include "WaveManager.hpp"
 #include "Explosion.hpp"
+#include "AudioEngine.hpp"
 //#include "json.hpp"
 
 enum class gameState { //add more states as needed
@@ -140,11 +142,13 @@ int main() {
 	MapDisplay mapSelectDisplay;
 	float scale = 3.8f;
 	mapSelectDisplay.load(mapSelectPath, { 64, 64 }, mapSelectTiles.data(), 3, 2, scale);
+	std::jthread musicThread(MusicThread);
 	while (window.isOpen()) {
 		float deltaTime = clock.restart().asSeconds();
 		while (std::optional<sf::Event> opt = window.pollEvent()) {
 			sf::Event event = *opt;
 			if (event.is<sf::Event::Closed>()) {
+				stopSound.store(true);
 				window.close();
 			}
 			if (gameState == gameState::menu) {
@@ -183,6 +187,7 @@ int main() {
 						// load map from json into map array and switch game state to game
 						//temporary code ahead
 						gameState = gameState::game;
+						isInGame.store(true);
 					}
 				}
 			}
@@ -276,6 +281,7 @@ int main() {
 							endScreenText.setString("You Win!");
 							endScreenText.setOrigin(endScreenText.getLocalBounds().size / 2.0f);
 							endScreenText.setPosition({ window.getSize().x / 2.0f, window.getSize().y / 2.0f });
+							isInGame.store(false);
 						}
 					}
 					if (lives <= 0) {
@@ -284,6 +290,7 @@ int main() {
 						endScreenText.setString("Game Over");
 						endScreenText.setOrigin(endScreenText.getLocalBounds().size / 2.0f);
 						endScreenText.setPosition({ window.getSize().x / 2.0f, window.getSize().y / 2.0f });
+						isInGame.store(false);
 					}
 				}
 				if (tower.isActive()) {
