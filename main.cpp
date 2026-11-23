@@ -9,6 +9,10 @@
 #include "AudioEngine.hpp"
 //#include "json.hpp"
 
+#ifdef _WIN32
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+#endif
+
 enum class gameState { //add more states as needed
 	menu,
 	game,
@@ -177,7 +181,7 @@ int main() {
 						//fix this to work with the scale of the map display, and also account for the offset of the map display
 						int horizontalIndex = static_cast<int>(mousePos.x / (64.0f * scale + 20 * scale));
 						int verticalIndex = static_cast<int>(mousePos.y / (64.0f * scale + 20 * scale));
-						std::cout << "Mouse clicked at: " << mousePos.x << ", " << mousePos.y << std::endl << "Horizontal Index: " << horizontalIndex << ", Vertical Index: " << verticalIndex << std::endl;
+						//std::cout << "Mouse clicked at: " << mousePos.x << ", " << mousePos.y << std::endl << "Horizontal Index: " << horizontalIndex << ", Vertical Index: " << verticalIndex << std::endl;
 						if (horizontalIndex < 0 || horizontalIndex >= 3 || verticalIndex < 0 || verticalIndex >= 2 || mousePos.x < 20 * scale || mousePos.y < 20 * scale ||
 						mousePos.x < horizontalIndex * 64 * scale + 20 * scale + (20 * horizontalIndex) * scale || mousePos.y < verticalIndex * 64 * scale + 20 * scale + (20 * verticalIndex) * scale) {
 							continue;
@@ -214,8 +218,13 @@ int main() {
 						waveIsActive = true;
 					}
 				}
+				if (event.is<sf::Event::FocusLost>() && tower.isActive()) {
+					tower.toggleActive();
+				}
 				if (event.is<sf::Event::MouseButtonPressed>()) {
 					if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+						//std::cout << "pressed at " << sf::Mouse::getPosition().x << " " << sf::Mouse::getPosition().y << std::endl;
+						//std::cout << "Tower at " << static_cast<int>(tower.getPosition().x) / 64 << " " << static_cast<int>(tower.getPosition().y) / 64 << std::endl;
 						if (tower.isActive()) {
 							if (tower.place(tower.getPosition(), tiles.data(), spawnTile, towers, currency)) {
 								tower.setAlpha(1);
@@ -312,12 +321,12 @@ int main() {
 							if (distance <= towerI.getRange() && towerI.getType() == type::turret) {
 								towerI.shoot(enemy.getPosition(), turretProjectiles, tileSet);
 
-								std::cout << turretProjectiles.size() << std::endl;
+								//std::cout << turretProjectiles.size() << std::endl;
 								break;
 							}
 							else if (distance <= towerI.getRange() && towerI.getType() == type::rocket) {
 								towerI.shoot(enemy.getPosition(), rocketProjectiles, tileSet);
-								std::cout << rocketProjectiles.size() << std::endl;
+								//std::cout << rocketProjectiles.size() << std::endl;
 								break;
 							}
 						}

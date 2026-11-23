@@ -97,82 +97,117 @@ public:
 				if (currency < 10) return false;
 				break;
 			}
+			bool pass = true;
 			sf::Vector2i mapPosition = { static_cast<int>(position.x) / 64, static_cast<int>(position.y) / 64 };
 			int index = mapPosition.x + mapPosition.y * 16;
-			if (map[index] == spawnTile) return false;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
+			if (pass) {
+				if (map[index] == spawnTile) return false;
+			}
 			//check collisions based on the diagram in my math notebook
 			mapPosition.y -= 1;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
 			//sides
 			index = mapPosition.x + mapPosition.y * 16;
 			sf::Vector2f boundary = { mapPosition.x * 64.f, mapPosition.y * 64.f + 64.f };
-			if (map[index] == spawnTile) {
-				if (position.y - boundary.y < 15)
-					return false;
+			if (pass) {
+				if (map[index] == spawnTile) {
+					if (position.y - boundary.y < 15)
+						return false;
+				}
 			}
+			pass = true; //continue the pass logic onward
 			mapPosition.y += 1;
 			mapPosition.x += 1;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
 			index = mapPosition.x + mapPosition.y * 16;
 			boundary.x = mapPosition.x * 64;
-			if (map[index] == spawnTile) {
-				if (boundary.x - position.x < 15)
-					return false;
+			if (pass) {
+				if (map[index] == spawnTile) {
+					if (boundary.x - position.x < 15)
+						return false;
+				}
 			}
+			pass = true;
 			mapPosition.x -= 1;
 			mapPosition.y += 1;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
 			index = mapPosition.x + mapPosition.y * 16;
 			boundary.y = mapPosition.y * 64;
-			if (map[index] == spawnTile) {
-				if (boundary.y - position.y < 15)
-					return false;
+			if (pass) {
+				if (map[index] == spawnTile) {
+					if (boundary.y - position.y < 15)
+						return false;
+				}
 			}
+			pass = true;
 			mapPosition.x -= 1;
 			mapPosition.y -= 1;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
 			index = mapPosition.x + mapPosition.y * 16;
 			boundary.x = mapPosition.x * 64 + 64;
-			if (map[index] == spawnTile) {
-				if (position.x - boundary.x < 15)
-					return false;
+			if (pass) {
+				if (map[index] == spawnTile) {
+					if (position.x - boundary.x < 15)
+						return false;
+				}
 			}
+			pass = true;
 			//corners
 			mapPosition.y -= 1;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
 			index = mapPosition.x + mapPosition.y * 16;
 			boundary.x = mapPosition.x * 64 + 64;
 			boundary.y = mapPosition.y * 64 + 64;
 			sf::Vector2f direction = boundary - position;
 			float distance = direction.lengthSquared();
-			if (map[index] == spawnTile) {
-				if (distance < 15 * 15)
-					return false;
+			if (pass) {
+				if (map[index] == spawnTile) {
+					if (distance < 15 * 15)
+						return false;
+				}
 			}
+			pass = true;
 			mapPosition.x += 2;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
 			index = mapPosition.x + mapPosition.y * 16;
 			boundary.x = mapPosition.x * 64;
 			boundary.y = mapPosition.y * 64 + 64;
 			direction = boundary - position;
 			distance = direction.lengthSquared();
-			if (map[index] == spawnTile) {
-				if (distance < 15 * 15)
-					return false;
+			if (pass) {
+				if (map[index] == spawnTile) {
+					if (distance < 15 * 15)
+						return false;
+				}
 			}
+			pass = true;
 			mapPosition.y += 2;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
 			index = mapPosition.x + mapPosition.y * 16;
 			boundary.x = mapPosition.x * 64;
 			boundary.y = mapPosition.y * 64;
 			direction = boundary - position;
 			distance = direction.lengthSquared();
-			if (map[index] == spawnTile) {
-				if (distance < 15 * 15)
-					return false;
+			if (pass) {
+				if (map[index] == spawnTile) {
+					if (distance < 15 * 15)
+						return false;
+				}
 			}
+			pass = true;
 			mapPosition.x -= 2;
+			if (mapPosition.x >= 16 || mapPosition.x < 0 || mapPosition.y >= 16 || mapPosition.y < 0) pass = false;
 			index = mapPosition.x + mapPosition.y * 16;
 			boundary.x = mapPosition.x * 64 + 64;
 			boundary.y = mapPosition.y * 64;
 			direction = boundary - position;
 			distance = direction.lengthSquared();
-			if (map[index] == spawnTile) {
-				if (distance < 15 * 15)
-					return false;
+			if (pass) {
+				if (map[index] == spawnTile) {
+					if (distance < 15 * 15)
+						return false;
+				}
 			}
 			for (int i = 0; i < towers.size(); i++) {
 				direction = towers[i].getPosition() - position;

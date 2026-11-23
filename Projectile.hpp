@@ -96,7 +96,7 @@ public:
 						float distanceToOther = (otherEnemy.getPosition() - textureSprite.getPosition()).lengthSquared();
 						if (distanceToOther < 80.f * 80.f) { // AOE radius for rocket
 							otherEnemy.addDamage(damage);
-							std::cout << "Rocket AOE hit! Enemy HP: " << otherEnemy.getIsDead() << std::endl;
+							//std::cout << "Rocket AOE hit! Enemy HP: " << otherEnemy.getIsDead() << std::endl;
 						}
 					}
 					bool explosionTriggered = false;

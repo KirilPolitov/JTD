@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "TileMap.hpp"
-#include <iostream>
+//#include <iostream>
 
 enum class EnemyType {
 	normal,
@@ -36,7 +36,7 @@ public:
 			hp = 5;
 			break;
 		}
-		std::cout << "spawned with hp: " << hp << std::endl;
+		//std::cout << "spawned with hp: " << hp << std::endl;
 	}
 	void update(float deltaTime, const int* map, int width, int height, int& lives) {
 		if (isDead) return;
@@ -174,10 +174,10 @@ public:
 		textureSprite.setTextureRect(rect);
 		textureSprite.setOrigin(textureSprite.getLocalBounds().size / 2.0f);
 	}
-	void printDebug() const {
+	/*void printDebug() const {
 		std::cout << "Enemy size: " << textureSprite.getLocalBounds().size.x << "x" << textureSprite.getLocalBounds().size.y << "y" << std::endl;
 		std::cout << "Enemy position: " << textureSprite.getPosition().x << "x" << textureSprite.getPosition().y << "y" << std::endl;
-	}
+	}*/
 private:
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
 		if (isDead) return;
