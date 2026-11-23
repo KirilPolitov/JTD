@@ -91,7 +91,7 @@ public:
 		if (towerState == state::held) {
 			switch (towerType) {
 			case type::turret:
-				if (currency < 3) return false;
+				if (currency < 5) return false;
 				break;
 			case type::rocket:
 				if (currency < 10) return false;
