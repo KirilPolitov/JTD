@@ -23,14 +23,6 @@ public:
 		time -= deltaTime;
 		if (time < 0) {
 			Enemy enemy(texture, startPos, wave[chunkProgress].m_type);
-			switch (wave[chunkProgress].m_type) {
-			case EnemyType::normal:
-				enemy.setTextureRect({ { 17 * 64, 11 * 64 }, { 64, 64 } });
-				break;
-			case EnemyType::tank:
-				enemy.setTextureRect({ { 18 * 64, 11 * 64 }, { 64, 64 } });
-				break;
-			}
 			enemies.push_back(enemy);
 
 			time = wave[chunkProgress].spawnTime;
@@ -41,7 +33,7 @@ public:
 			}
 		}
 	}
-	bool checkStatus(std::vector<Enemy>& enemies) { //do this later loop over it if they are all dead thats the sign to advance to the next wave of course on pressing space
+	bool checkStatus(std::vector<Enemy>& enemies) {
 		for (const Enemy& enemy : enemies) {
 			if (!enemy.getIsDead()) {
 				return false;

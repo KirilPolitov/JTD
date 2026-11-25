@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "Enemy.hpp"
 #include "Projectile.hpp"
+#include "Explosion.hpp"
 
 enum class state {
 	held,
@@ -12,6 +13,7 @@ class Tower : public sf::Drawable {
 	type towerType;
 	state towerState;
 	sf::RectangleShape textureSprite;
+	Explosion muzzleFlash;
 	bool active;
 	int range;
 	float cooldownTime = 1.95f; //seconds
@@ -44,7 +46,8 @@ public:
 	const bool isActive() const {
 		return active;
 	}
-	Tower(type type, const sf::Texture& texture, sf::Vector2f position) : towerType(type), towerState(state::held), textureSprite({32, 32}), active(false) {
+	Tower(type type, const sf::Texture& texture, sf::Vector2f position) : towerType(type), towerState(state::held), textureSprite({32, 32}), active(false), muzzleFlash(texture, {50, 50}, 0.f)
+	{
 		switch (type) {
 		case type::turret:
 			cooldownTime = 1.95f;
@@ -229,6 +232,8 @@ public:
 				break;
 			case type::rocket:
 				cooldownTime = 4.0f; // Reset cooldown time for the next shot
+				textureSprite.setTextureRect({ { 22 * 64, 9 * 64 }, { 64, 64 } });
+				textureSprite.setOrigin(textureSprite.getLocalBounds().size / 2.0f);
 				break;
 			}
 			for (Projectile& projectile : projectiles) {
@@ -238,6 +243,10 @@ public:
 					float angleRad = std::atan2(direction.y, direction.x);
 					float angleDeg = angleRad * 180.0f / 3.14159265f + 90;
 					textureSprite.setRotation(sf::degrees(angleDeg));
+					//sf::Vector2f point = textureSprite.getPosition(); //do the trigonometry to find where to call the explosion
+					muzzleFlash.callExplosion(textureSprite.getPosition(), 0.1f);
+					muzzleFlash.move(direction);
+					muzzleFlash.setRotation(angleDeg);
 					return;
 				}
 			}
@@ -247,6 +256,10 @@ public:
 			float angleRad = std::atan2(direction.y, direction.x);
 			float angleDeg = angleRad * 180.0f / 3.14159265f + 90;
 			textureSprite.setRotation(sf::degrees(angleDeg));
+			//sf::Vector2f point = textureSprite.getPosition(); //do the trigonometry to find where to call the explosion
+			muzzleFlash.callExplosion(textureSprite.getPosition(), 0.1f);
+			muzzleFlash.move(direction);
+			muzzleFlash.setRotation(angleDeg);
 		}
 	}
 	void updateCooldown(float deltaTime) {
@@ -254,8 +267,15 @@ public:
 			cooldownTime -= deltaTime;
 			if (cooldownTime <= 0.0f) {
 				towerState = state::ready;
+				if (towerType == type::rocket) {
+					textureSprite.setTextureRect({ { 22 * 64, 8 * 64 }, { 64, 64 } });
+					textureSprite.setOrigin(textureSprite.getLocalBounds().size / 2.0f);
+				}
 			}
 		}
+	}
+	void updateFlashCooldown(float deltaTime) {
+		muzzleFlash.updateCooldown(deltaTime);
 	}
 	const type getType() const {
 		return towerType;
@@ -283,6 +303,9 @@ public:
 	}
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const override {
 		if (!active) return;
-		target.draw(textureSprite, states);
+		target.draw(textureSprite, states); 
+		if (muzzleFlash.isActive() && towerState != state::held && towerType == type::turret) {
+			target.draw(muzzleFlash);
+		}
 	}
 };

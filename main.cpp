@@ -79,12 +79,17 @@ int main() {
 	bool waveIsActive = false;
 	int activeWaveIndex = 0;
 	std::vector<Wave> waves;
-	waves.reserve(5);
+	waves.reserve(8);
+	//waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::heavyArmored, 1, 2.f }}, { 0, 2 }, tileSet));
 	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::normal, 5, 2.f }}, { 0, 2 }, tileSet));
 	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::tank, 1, 1.f }, { EnemyType::normal, 5, 1.f }}, { 0, 2 }, tileSet));
 	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::tank, 1, 1.f }, { EnemyType::normal, 1, 1.f }, { EnemyType::tank, 1, 1.f }, { EnemyType::normal, 1, 1.f }, { EnemyType::tank, 1, 1.f }}, { 0, 2 }, tileSet));
 	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::tank, 8, 1.f }}, { 0, 2 }, tileSet));
 	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::tank, 15, 0.5f }}, { 0, 2 }, tileSet));
+	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::tank, 5, 1.f }, { EnemyType::armored, 5, 2.f }}, { 0, 2 }, tileSet));
+	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::armored, 1, 2.f }, { EnemyType::heavyArmored, 1, 2.f }, { EnemyType::armored, 1, 2.f }}, { 0, 2 }, tileSet)); 
+	waves.push_back(Wave(std::vector<WaveChunk>{{ EnemyType::heavyArmored, 5, 2.f }}, { 0, 2 }, tileSet));
+
 	std::vector<Explosion> explosions;
 	explosions.reserve(8);
 	sf::Texture explosionTexture;
@@ -312,21 +317,19 @@ int main() {
 				for (Tower& towerI : towers) {
 					if (waveIsActive)
 						towerI.updateCooldown(deltaTime);
+					towerI.updateFlashCooldown(deltaTime);
 					//if (towerI.getType() == type::turret) {
 						for (const Enemy& enemy : enemies) {
 							if (enemy.getIsDead()) continue; // Skip dead enemies
 							sf::Vector2f direction = enemy.getPosition() - towerI.getPosition();
-							float distance = direction.length();
+							float distance = direction.lengthSquared();
 
-							if (distance <= towerI.getRange() && towerI.getType() == type::turret) {
+							if (distance <= towerI.getRange() * towerI.getRange() && towerI.getType() == type::turret) {
 								towerI.shoot(enemy.getPosition(), turretProjectiles, tileSet);
-
-								//std::cout << turretProjectiles.size() << std::endl;
 								break;
 							}
-							else if (distance <= towerI.getRange() && towerI.getType() == type::rocket) {
+							else if (distance <= towerI.getRange() * towerI.getRange() && towerI.getType() == type::rocket) {
 								towerI.shoot(enemy.getPosition(), rocketProjectiles, tileSet);
-								//std::cout << rocketProjectiles.size() << std::endl;
 								break;
 							}
 						}
@@ -334,7 +337,16 @@ int main() {
 				}
 				window.clear(sf::Color::Black);
 				window.draw(tileMap);
-				for (Enemy& enemy : enemies) {
+				for (const Enemy& enemy : enemies) {
+					if (enemy.getType() == EnemyType::normal || enemy.getType() == EnemyType::tank) continue;
+					window.draw(enemy);
+				}
+				for (const Enemy& enemy : enemies) {
+					if (enemy.getType() == EnemyType::armored || enemy.getType() == EnemyType::heavyArmored || enemy.getIsDead()) continue;
+					window.draw(enemy.getSecondary());
+				}
+				for (const Enemy& enemy : enemies) {
+					if (enemy.getType() == EnemyType::armored || enemy.getType() == EnemyType::heavyArmored) continue;
 					window.draw(enemy);
 				}
 				//window.draw(enemy);
@@ -356,11 +368,7 @@ int main() {
 				for (Projectile& projectile : turretProjectiles) {
 					if (projectile.isActive()) {
 						CollisionResult result = projectile.update(deltaTime, enemies, currency, explosions, deathExplosions, explosionTexture);
-
-						if (result == CollisionResult::Hit) {
-							// Hit logic handled inside update, nothing extra needed here
-						}
-						else if (result == CollisionResult::OutOfRange) {
+						if (result == CollisionResult::OutOfRange) {
 							projectile.setActive(false);
 						}
 
@@ -370,10 +378,7 @@ int main() {
 				for (Projectile& projectile : rocketProjectiles) {
 					if (projectile.isActive()) {
 						CollisionResult result = projectile.update(deltaTime, enemies, currency, explosions, deathExplosions, explosionTexture);
-						if (result == CollisionResult::Hit) {
-							// Hit logic handled inside update, nothing extra needed here
-						}
-						else if (result == CollisionResult::OutOfRange) {
+						if (result == CollisionResult::OutOfRange) {
 							projectile.setActive(false);
 						}
 						window.draw(projectile);
